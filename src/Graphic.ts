@@ -1,37 +1,30 @@
-abstract class Graphic 
+module Graphics
 {
-    Position: Point;
+    export abstract class Graphic {
+        Position: Point;
 
-    constructor() 
-    {
+        constructor() { }
 
+        public Draw(): void { }
     }
 
-    public Draw(): void 
-    {
+    export class Rect extends Graphic {
+        Length: number;
+        Height: number;
+        Color: string;
 
-    }
-}
+        constructor(Length: number, Height: number, Color: string) {
+            super();
 
-class Rect extends Graphic
-{
-    Length: number;
-    Height: number;
-    Color: string;
+            this.Length = Length;
+            this.Height = Height;
+            this.Color = Color;
+        }
 
-    constructor(Length: number, Height: number, Color: string)
-    {
-        super();
-        
-        this.Length = Length;
-        this.Height = Height;
-        this.Color = Color;
-    }
-
-    public Draw(): void
-    {   
-        Context.beginPath();
-        Context.fillStyle = this.Color;
-        Context.fillRect(this.Position.x, this.Position.y, this.Length, this.Height);
+        public Draw(): void {
+            Context.beginPath();
+            Context.fillStyle = this.Color;
+            Context.fillRect(this.Position.x, this.Position.y, this.Length, this.Height);
+        }
     }
 }

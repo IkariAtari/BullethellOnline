@@ -6,154 +6,13 @@ var __extends = (this && this.__extends) || (function () {
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var Collider = /** @class */ (function () {
-    function Collider() {
-    }
-    Collider.prototype.CheckCollision = function (a) {
-        return false;
-    };
-    return Collider;
-}());
-var BoxCollider = /** @class */ (function (_super) {
-    __extends(BoxCollider, _super);
-    function BoxCollider(Width, Height, Position) {
-        var _this = _super.call(this) || this;
-        _this.Width = Width;
-        _this.Height = Height;
-        _this.Posistion = Position;
-        return _this;
-        //console.log("Collider created");
-    }
-    BoxCollider.prototype.CheckCollision = function (a) {
-        if (this.Posistion.x < a.Posistion.x + a.Width && this.Posistion.x + this.Width > a.Posistion.x && this.Posistion.y < a.Posistion.y + a.Height && this.Posistion.y + this.Height > a.Posistion.y) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    };
-    return BoxCollider;
-}(Collider));
-var Canvas = document.getElementById("canvas");
-var Context = Canvas.getContext("2d");
-var Game = /** @class */ (function () {
-    function Game() {
-        var _this = this;
-        console.log("Game instance created");
-        this.CurrentLevel = new Level();
-        this.timer = setInterval(function () { return _this.GameUpdate(); }, 10);
-    }
-    Game.Instantiate = function (GameObject) {
-        Game.GameObjects[Game.GameObjects.length] = GameObject;
-        //console.log(Game.GameObjects);
-    };
-    Game.RemoveGameObject = function (GameObject) {
-        for (var i = 0; i < Game.GameObjects.length; i++) {
-            if (Game.GameObjects[i].ID == GameObject.ID) {
-                Game.GameObjects.splice(i, 1);
-                console.log(Game.GameObjects);
-            }
-        }
-    };
-    Game.prototype.GameUpdate = function () {
-        Input.HandleKeys();
-        this.CurrentLevel.LogicUpdate();
-    };
-    Game.GameObjects = [];
-    return Game;
-}());
-var GameObject = /** @class */ (function () {
-    function GameObject(Position, Graphic, Collider, Tag) {
-        if (Tag === void 0) { Tag = "none"; }
-        this.Position = Position;
-        this.Graphic = Graphic;
-        this.Collider = Collider;
-        this.Tag = Tag;
-        if (GameObject.Count == null) {
-            GameObject.Count = 0;
-        }
-        else {
-            GameObject.Count += 1;
-        }
-        this.ID = GameObject.Count;
-        //console.log(this.ID + " " + GameObject.Count);
-    }
-    GameObject.prototype.Start = function () {
-    };
-    GameObject.prototype.LogicUpdate = function () {
-        this.Graphic.Position = this.Position;
-        this.Collider.Posistion = this.Position;
-        for (var i = 0; i < Game.GameObjects.length; i++) {
-            if (Game.GameObjects[i] != this) {
-                GameObject.CheckCollision(this, Game.GameObjects[i]);
-            }
-        }
-    };
-    GameObject.prototype.Draw = function () {
-        this.Graphic.Draw();
-    };
-    GameObject.CheckCollision = function (a, b) {
-        if (a.Collider.CheckCollision(b.Collider)) {
-            b.OnCollision(a);
-        }
-    };
-    GameObject.prototype.OnCollision = function (Collision) {
-    };
-    return GameObject;
-}());
-var Player = /** @class */ (function (_super) {
-    __extends(Player, _super);
-    function Player(Posistion, Graphic, Collider) {
-        var _this = _super.call(this, Posistion, Graphic, Collider) || this;
-        _this.ShootTimerValue = 0;
-        _this.ShootTimer = 10;
-        _this.CurrentAngle = 180;
-        _this.Counter = 0;
-        _this.Tag = "Player";
-        return _this;
-    }
-    Player.prototype.LogicUpdate = function () {
-        _super.prototype.LogicUpdate.call(this);
-        if ("arrowright" in Input.KeysDown) {
-            this.Position.x += 1;
-        }
-        if ("arrowleft" in Input.KeysDown) {
-            this.Position.x -= 1;
-        }
-        if ("arrowup" in Input.KeysDown) {
-            this.Position.y -= 1;
-        }
-        if ("arrowdown" in Input.KeysDown) {
-            this.Position.y += 1;
-        }
-        if (" " in Input.KeysDown) {
-            if (this.ShootTimerValue <= 0) {
-                var value = Math.sin(this.Counter);
-                //console.log(value * 180);
-                this.CurrentAngle = 270 + value * 10;
-                //for(let i = 0; i < 4; i++)
-                //{
-                Game.Instantiate(new Bullet(this.Position, new Rect(5, 5, "red"), new BoxCollider(5, 5, this.Position), "PlayerBullet", Point.AngleToHeading(this.CurrentAngle), 3.5));
-                //}
-                this.Counter += 1;
-                //console.log("Current Angle: "+this.CurrentAngle);
-                this.ShootTimerValue = this.ShootTimer;
-            }
-            else {
-                this.ShootTimerValue -= 1;
-            }
-        }
-        else {
-            this.ShootTimerValue = this.ShootTimer;
-        }
-    };
-    return Player;
-}(GameObject));
 var Bullet = /** @class */ (function (_super) {
     __extends(Bullet, _super);
     function Bullet(Posistion, Graphic, Collider, Tag, Direction, Speed) {
@@ -190,6 +49,45 @@ var Bullet = /** @class */ (function (_super) {
     };
     return Bullet;
 }(GameObject));
+var Colliders;
+(function (Colliders) {
+    var Collider = /** @class */ (function () {
+        function Collider() {
+        }
+        Collider.prototype.CheckCollision = function (a) {
+            return false;
+        };
+        return Collider;
+    }());
+    Colliders.Collider = Collider;
+    var BoxCollider = /** @class */ (function (_super) {
+        __extends(BoxCollider, _super);
+        function BoxCollider(Width, Height, Position) {
+            var _this = _super.call(this) || this;
+            _this.Width = Width;
+            _this.Height = Height;
+            _this.Posistion = Position;
+            _this.Rect = new Rect(Width, Height, "green");
+            return _this;
+            //console.log("Collider created");
+        }
+        BoxCollider.prototype.CheckCollision = function (a) {
+            if (this.Posistion.x < a.Posistion.x + a.Width && this.Posistion.x + this.Width > a.Posistion.x && this.Posistion.y < a.Posistion.y + a.Height && this.Posistion.y + this.Height > a.Posistion.y) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return BoxCollider;
+    }(Collider));
+    Colliders.BoxCollider = BoxCollider;
+})(Colliders || (Colliders = {}));
+var Component = /** @class */ (function () {
+    function Component() {
+    }
+    return Component;
+}());
 var Enemy = /** @class */ (function (_super) {
     __extends(Enemy, _super);
     function Enemy(Position, Graphic, Collider, Health, Path, Speed) {
@@ -247,29 +145,78 @@ var EnemyPath = /** @class */ (function () {
     }
     return EnemyPath;
 }());
-var Graphic = /** @class */ (function () {
-    function Graphic() {
+var Canvas = document.getElementById("canvas");
+var Context = Canvas.getContext("2d");
+var GameObject = GameComponents.GameObject;
+var Game = /** @class */ (function () {
+    function Game() {
+        var _this = this;
+        console.log("Game instance created");
+        this.CurrentLevel = new Level();
+        this.timer = setInterval(function () { return _this.GameUpdate(); }, 10);
     }
-    Graphic.prototype.Draw = function () {
+    Game.Instantiate = function (GameObject) {
+        Game.GameObjects[Game.GameObjects.length] = GameObject;
+        //console.log(Game.GameObjects);
     };
-    return Graphic;
+    Game.RemoveGameObject = function (GameObject) {
+        for (var i = 0; i < Game.GameObjects.length; i++) {
+            if (Game.GameObjects[i].ID == GameObject.ID) {
+                Game.GameObjects.splice(i, 1);
+                console.log(Game.GameObjects);
+            }
+        }
+    };
+    Game.prototype.GameUpdate = function () {
+        Input.HandleKeys();
+        this.CurrentLevel.LogicUpdate();
+    };
+    Game.GameObjects = [];
+    return Game;
 }());
-var Rect = /** @class */ (function (_super) {
-    __extends(Rect, _super);
-    function Rect(Length, Height, Color) {
-        var _this = _super.call(this) || this;
-        _this.Length = Length;
-        _this.Height = Height;
-        _this.Color = Color;
-        return _this;
-    }
-    Rect.prototype.Draw = function () {
-        Context.beginPath();
-        Context.fillStyle = this.Color;
-        Context.fillRect(this.Position.x, this.Position.y, this.Length, this.Height);
-    };
-    return Rect;
-}(Graphic));
+var GameComponents;
+(function (GameComponents) {
+    var GameObject = /** @class */ (function () {
+        function GameObject(Position, Graphic, Collider, Tag) {
+            if (Tag === void 0) { Tag = "none"; }
+            this.Position = Position;
+            this.Graphic = Graphic;
+            this.Collider = Collider;
+            this.Tag = Tag;
+            if (GameObject.Count == null) {
+                GameObject.Count = 0;
+            }
+            else {
+                GameObject.Count += 1;
+            }
+            this.ID = GameObject.Count;
+            //console.log(this.ID + " " + GameObject.Count);
+        }
+        GameObject.prototype.Start = function () {
+        };
+        GameObject.prototype.LogicUpdate = function () {
+            this.Graphic.Position = this.Position;
+            this.Collider.Posistion = this.Position;
+            for (var i = 0; i < Game.GameObjects.length; i++) {
+                if (Game.GameObjects[i] != this) {
+                    GameObject.CheckCollision(this, Game.GameObjects[i]);
+                }
+            }
+        };
+        GameObject.prototype.Draw = function () {
+            this.Graphic.Draw();
+        };
+        GameObject.CheckCollision = function (a, b) {
+            if (a.Collider.CheckCollision(b.Collider)) {
+                b.OnCollision(a);
+            }
+        };
+        GameObject.prototype.OnCollision = function (Collision) {
+        };
+        return GameObject;
+    }());
+    GameComponents.GameObject = GameObject;
+})(GameComponents || (GameComponents = {}));
 var Input = /** @class */ (function () {
     function Input() {
     }
@@ -352,7 +299,6 @@ var SpawnAction = /** @class */ (function (_super) {
     return SpawnAction;
 }(LevelAction));
 var Pattern = /** @class */ (function () {
-    //public PlayerPosition: Point;
     function Pattern(Bullets, Interval) {
         this.Bullets = Bullets;
         this.Interval = Interval;
@@ -363,8 +309,65 @@ var Pattern = /** @class */ (function () {
             Game.Instantiate(this.Bullets[i]);
         }
     };
+    Pattern.prototype.PatternStep = function () {
+    };
+    Pattern.prototype.StartPattern = function (Position) {
+        var _this = this;
+        this.interval = setInterval(function () { return _this.PatternStep(); }, 10);
+    };
+    Pattern.prototype.StopPattern = function () {
+        clearInterval(this.interval);
+    };
     return Pattern;
 }());
+var Player = /** @class */ (function (_super) {
+    __extends(Player, _super);
+    function Player(Posistion, Graphic, Collider) {
+        var _this = _super.call(this, Posistion, Graphic, Collider) || this;
+        _this.ShootTimerValue = 0;
+        _this.ShootTimer = 10;
+        _this.CurrentAngle = 180;
+        _this.Counter = 0;
+        _this.Tag = "Player";
+        return _this;
+    }
+    Player.prototype.LogicUpdate = function () {
+        _super.prototype.LogicUpdate.call(this);
+        if ("arrowright" in Input.KeysDown) {
+            this.Position.x += 1;
+        }
+        if ("arrowleft" in Input.KeysDown) {
+            this.Position.x -= 1;
+        }
+        if ("arrowup" in Input.KeysDown) {
+            this.Position.y -= 1;
+        }
+        if ("arrowdown" in Input.KeysDown) {
+            this.Position.y += 1;
+        }
+        if (" " in Input.KeysDown) {
+            if (this.ShootTimerValue <= 0) {
+                var value = Math.sin(this.Counter);
+                //console.log(value * 180);
+                this.CurrentAngle = 270 + value * 10;
+                //for(let i = 0; i < 4; i++)
+                //{
+                Game.Instantiate(new Bullet(this.Position, new Rect(5, 5, "red"), new BoxCollider(5, 5, this.Position), "PlayerBullet", Point.AngleToHeading(this.CurrentAngle), 3.5));
+                //}
+                this.Counter += 1;
+                //console.log("Current Angle: "+this.CurrentAngle);
+                this.ShootTimerValue = this.ShootTimer;
+            }
+            else {
+                this.ShootTimerValue -= 1;
+            }
+        }
+        else {
+            this.ShootTimerValue = this.ShootTimer;
+        }
+    };
+    return Player;
+}(GameObject));
 var Point = /** @class */ (function () {
     function Point(x, y) {
         this.x = x;

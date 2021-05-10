@@ -1,6 +1,8 @@
 var Canvas = document.getElementById("canvas");
 var Context = Canvas.getContext("2d");
 
+import GameObject = GameComponents.GameObject;
+
 class Game 
 {
     public static GameObjects: GameObject[] = [];
