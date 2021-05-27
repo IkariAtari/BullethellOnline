@@ -1,8 +1,5 @@
-module GameComponents
-{
-    import Graphic = Graphics.Graphic;
-    
-    export class GameObject 
+ 
+    class GameObject 
     {
         public Tag: string;
 
@@ -74,4 +71,3 @@ module GameComponents
 
         }
     }
-}

@@ -1,8 +1,9 @@
 {
-    "compilerOptions": {
-      "target": "es5",
+    "compilerOptions": 
+    {
+      "target": "es6",
       "rootDir": "./src",
-      "outFile": "./bin/game.js",
+      "outDir": "./bin",
       "sourceMap": true, 
     }
-  }
+}

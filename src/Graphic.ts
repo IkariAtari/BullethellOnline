@@ -1,6 +1,5 @@
-module Graphics
-{
-    export abstract class Graphic {
+
+    abstract class Graphic {
         Position: Point;
 
         constructor() { }
@@ -8,7 +7,7 @@ module Graphics
         public Draw(): void { }
     }
 
-    export class Rect extends Graphic {
+    class Rect extends Graphic {
         Length: number;
         Height: number;
         Color: string;
@@ -27,4 +26,3 @@ module Graphics
             Context.fillRect(this.Position.x, this.Position.y, this.Length, this.Height);
         }
     }
-}
