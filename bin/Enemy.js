@@ -1,4 +1,7 @@
-class Enemy extends GameObject {
+import { GameObject } from "./Core/GameObject";
+import { Point } from "./Core/Point";
+import { GameManager } from "./Core/GameManager";
+export class Enemy extends GameObject {
     constructor(Position, Graphic, Collider, Health, Path, Speed) {
         super(new Point(Position, -10), Graphic, Collider);
         this.isOnHold = false;
@@ -12,14 +15,13 @@ class Enemy extends GameObject {
     LogicUpdate() {
         super.LogicUpdate();
         if (this.Health <= 0) {
-            Game.RemoveGameObject(this);
+            GameManager.RemoveGameObject(this);
         }
         if (this.Tick < this.Path.Actions.length) {
             if (this.Iteration == this.Path.Actions[this.Tick][1]) {
                 switch (this.Path.Actions[this.Tick][0]) {
                     case "move":
                         this.Target = this.Path.Actions[this.Tick][2];
-                        //console.log(Point.Normalize(Point.Direction(this.Position, this.Target)));
                         break;
                     case "speed":
                         break;
@@ -46,7 +48,7 @@ class Enemy extends GameObject {
         this.Health -= Damage;
     }
 }
-class EnemyPath {
+export class EnemyPath {
     constructor(Actions) {
         this.Actions = Actions;
     }

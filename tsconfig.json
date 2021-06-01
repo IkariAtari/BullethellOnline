@@ -4,6 +4,10 @@
       "target": "es6",
       "rootDir": "./src",
       "outDir": "./bin",
+      "noImplicitAny": true,
+      "removeComments": true,
+      "alwaysStrict": true,
+      //"strict": true,
       "sourceMap": true, 
     }
 }

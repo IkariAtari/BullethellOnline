@@ -1,6 +1,8 @@
+import { Input } from "./Core/Input";
+import { Level } from "./Level";
 var Canvas = document.getElementById("canvas");
 var Context = Canvas.getContext("2d");
-class Game {
+export class Game {
     constructor() {
         console.log("Game instance created");
         this.CurrentLevel = new Level();
@@ -24,4 +26,5 @@ class Game {
     }
 }
 Game.GameObjects = [];
+var game = new Game();
 //# sourceMappingURL=Game.js.map

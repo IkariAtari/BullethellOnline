@@ -1,4 +1,10 @@
-class Enemy extends GameObject 
+import { BoxCollider } from "./Core/Collider";
+import { GameObject } from "./Core/GameObject";
+import { Point } from "./Core/Point";
+import { Graphic } from './Core/Graphic';
+import { GameManager } from "./Core/GameManager";
+
+export class Enemy extends GameObject 
 {
     public Health: number;
 
@@ -32,7 +38,7 @@ class Enemy extends GameObject
 
         if (this.Health <= 0) 
         {
-            Game.RemoveGameObject(this);
+            GameManager.RemoveGameObject(this);
         }
 
         if (this.Tick < this.Path.Actions.length) 
@@ -84,7 +90,7 @@ class Enemy extends GameObject
     }
 }
 
-class EnemyPath 
+export class EnemyPath 
 {
     public Actions: any[][];
 

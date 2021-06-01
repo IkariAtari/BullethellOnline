@@ -1,0 +1,34 @@
+{
+  "name": "bullethellonline",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "BullethellOnline": "Bullet.js"
+  },
+  "dependencies": {
+    "typescript": "^4.3.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.6.1",
+    "fs": "0.0.1-security",
+    "fs-extra": "^10.0.0",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.0"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IkariAtari/BullethellOnline.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IkariAtari/BullethellOnline/issues"
+  },
+  "homepage": "https://github.com/IkariAtari/BullethellOnline#readme",
+  "description": ""
+}

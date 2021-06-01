@@ -1,4 +1,11 @@
-class Bullet extends GameObject 
+import {GameObject} from './Core/GameObject';
+import {BoxCollider} from './Core/Collider';
+import {Point} from './Core/Point'
+import {Enemy} from './Enemy';
+import {Graphic} from './Core/Graphic';
+import { GameManager } from './Core/GameManager';
+
+export class Bullet extends GameObject 
 {
     public Velocity: Point;
 
@@ -21,11 +28,11 @@ class Bullet extends GameObject
 
         if (this.Position.y <= 0) 
         {
-            Game.RemoveGameObject(this);
+            GameManager.RemoveGameObject(this);
         }
         if (this.Position.x <= 0) 
         {
-            Game.RemoveGameObject(this);
+            GameManager.RemoveGameObject(this);
         }
     }
 
@@ -46,7 +53,7 @@ class Bullet extends GameObject
 
                 enemy.Hurt(1);
 
-                Game.RemoveGameObject(this);
+                GameManager.RemoveGameObject(this);
             }
         }
     }

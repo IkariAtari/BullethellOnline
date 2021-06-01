@@ -1,4 +1,11 @@
-class Player extends GameObject {
+import { Bullet } from "./Bullet";
+import { BoxCollider } from "./Core/Collider";
+import { GameManager } from "./Core/GameManager";
+import { GameObject } from "./Core/GameObject";
+import { Rect } from "./Core/Graphic";
+import { Input } from "./Core/Input";
+import { Point } from "./Core/Point";
+export class Player extends GameObject {
     constructor(Posistion, Graphic, Collider) {
         super(Posistion, Graphic, Collider);
         this.ShootTimerValue = 0;
@@ -24,14 +31,9 @@ class Player extends GameObject {
         if (" " in Input.KeysDown) {
             if (this.ShootTimerValue <= 0) {
                 let value = Math.sin(this.Counter);
-                //console.log(value * 180);
                 this.CurrentAngle = 270 + value * 10;
-                //for(let i = 0; i < 4; i++)
-                //{
-                Game.Instantiate(new Bullet(this.Position, new Rect(5, 5, "red"), new BoxCollider(5, 5, this.Position), "PlayerBullet", Point.AngleToHeading(this.CurrentAngle), 3.5));
-                //}
+                GameManager.Instantiate(new Bullet(this.Position, new Rect(5, 5, "red"), new BoxCollider(5, 5, this.Position), "PlayerBullet", Point.AngleToHeading(this.CurrentAngle), 3.5));
                 this.Counter += 1;
-                //console.log("Current Angle: "+this.CurrentAngle);
                 this.ShootTimerValue = this.ShootTimer;
             }
             else {

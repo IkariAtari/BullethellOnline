@@ -1,5 +1,29 @@
-class Level 
+import { Bullet } from "./Bullet";
+import { BoxCollider } from "./Core/Collider";
+import { GameManager } from "./Core/GameManager";
+import { GameObject } from "./Core/GameObject";
+import { Rect } from "./Core/Graphic";
+import { Point } from "./Core/Point";
+import { Enemy, EnemyPath } from "./Enemy";
+import { Pattern } from "./Pattern";
+import { Player } from "./Player";
+
+export class Level 
 {
+    // TODO: temporary, could be it's own class
+    private Tokens: Array<String>;
+
+    private BlockWords: Array<String> = 
+    [
+        'bullet',
+        'pattern',
+        'enemy',
+        'path',
+        'level',
+        'start',
+        'action'
+    ]
+
     public Patterns: Pattern[] =
     [
         new Pattern(
@@ -10,7 +34,8 @@ class Level
                 new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(2.5, 0.2), 0.2),
                 new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(5, 0.2), 0.2)
             ),
-            0
+            0,
+            ""
         )
     ];
 
@@ -56,9 +81,82 @@ class Level
     {
         this.Tick = 0;
         this.Iteration = 0;
+
+        // ! for testing purposes
+        this.Interpet();
     }
 
-    public LogicUpdate() 
+    private Interpet() : void
+    {
+        // interpet level file
+        // ! for testing purposes
+        let file:string = "LEVEL START SPAWN PLAYER END END"
+
+        this.Tokens = file.split(/\s+/);
+
+        // make blocks
+        for(let i:number = 0; i < this.Tokens.length; i++)
+        {
+            switch(this.Tokens[i].toLowerCase())
+            {
+                case "level":
+                    // levelcode
+                break;
+            }
+        }
+    }
+
+    private GetBlock(_toProcess:Array<string>) : Array<string>
+    {
+        let _backlog:number = 0;
+        let _tokens = new Array<string>();
+
+        for(let i:number = 0; i < _toProcess.length; i++)
+        {
+            if(this.BlockWords.includes(_toProcess[i]))
+            {
+                _backlog++;
+            }
+            if(_toProcess[i] == "end")
+            {
+                if(_backlog == 0)
+                {
+                    // cut array here
+                }
+
+                _backlog--;
+            }
+        }
+
+        return _tokens;
+    }
+
+    public BuildLevel() : void
+    {
+
+        for(let i:number = 0; i < tokens.length; i++)
+        {
+            switch(tokens[i].toLowerCase())
+            {
+                case "level":
+
+                break;
+
+                case "start":
+
+                break;
+            }
+        }
+
+        // Load patterns and other stuff
+    }
+
+    private ProcessLevelCommand(tokens:Array<string>)
+    {
+
+    }
+
+    public LogicUpdate()
     {
         if(this.Tick < this.Level.length)
         {
@@ -72,11 +170,11 @@ class Level
 
         this.Iteration += 1;
 
-        Context.clearRect(0, 0, 500, 500);
+        GameManager.Context.clearRect(0, 0, 500, 500);
 
-        for (let i = 0; i < Game.GameObjects.length; i++)
+        for (let i = 0; i < GameManager.GameObjects.length; i++)
         {
-            Game.GameObjects[i].LogicUpdate();
+            GameManager.GameObjects[i].LogicUpdate();
         }
 
         this.DrawUpdate();
@@ -84,9 +182,9 @@ class Level
 
     public DrawUpdate() 
     {
-        for (let i = 0; i < Game.GameObjects.length; i++) 
+        for (let i = 0; i < GameManager.GameObjects.length; i++) 
         {
-            Game.GameObjects[i].Draw();
+            GameManager.GameObjects[i].Draw();
         }
     }
 }
@@ -124,6 +222,6 @@ class SpawnAction extends LevelAction
 
     public Action(): void
     {
-        Game.Instantiate(this.Spawnable);
+        GameManager.Instantiate(this.Spawnable);
     }
 }
