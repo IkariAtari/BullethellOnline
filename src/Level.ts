@@ -133,27 +133,7 @@ export class Level
 
     public BuildLevel() : void
     {
-
-        for(let i:number = 0; i < tokens.length; i++)
-        {
-            switch(tokens[i].toLowerCase())
-            {
-                case "level":
-
-                break;
-
-                case "start":
-
-                break;
-            }
-        }
-
-        // Load patterns and other stuff
-    }
-
-    private ProcessLevelCommand(tokens:Array<string>)
-    {
-
+        
     }
 
     public LogicUpdate()
@@ -225,3 +205,15 @@ class SpawnAction extends LevelAction
         GameManager.Instantiate(this.Spawnable);
     }
 }
+
+// ! temporary location
+
+class Command
+{
+    public Run(): void
+    {
+
+    }
+
+
+} 
