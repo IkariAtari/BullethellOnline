@@ -25,6 +25,7 @@ export class Level {
             'spawnat',
             'move'
         ];
+        this.Variables = new Array();
         this.Blocks = new Array();
         this.Patterns = [
             new Pattern(new Array(new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-2.5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(0, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(2.5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(5, 0.2), 0.2)), 0, "")
@@ -46,7 +47,7 @@ export class Level {
         this.Interpet();
     }
     Interpet() {
-        let file = "LEVEL START PRINT KAAS; END END";
+        let file = "LEVEL START PRINT \"KAAS\" END END";
         this.Tokens = file.split(";");
         this.Tokens = file.split(/\s+/);
         this.MakeBlockList(this.Tokens);

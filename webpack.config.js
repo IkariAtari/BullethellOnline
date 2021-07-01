@@ -1,5 +1,6 @@
 // Webpack uses this to work with directories
 const path = require('path');
+const { library } = require('webpack');
 
 // This is the main configuration object.
 // Here, you write different options and tell Webpack what to do
@@ -13,7 +14,8 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     publicPath: '',
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    library: 'EntryPoint'
   },
 
   // Default mode for Webpack is production.
