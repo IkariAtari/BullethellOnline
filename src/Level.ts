@@ -11,9 +11,9 @@ import { Player } from "./Player";
 export class Level 
 {
     // TODO: temporary, could be it's own class
-    private Tokens: Array<String>;
+    private Tokens: Array<string>;
 
-    private BlockWords: Array<String> = 
+    private BlockWords: Array<string> = 
     [
         'bullet',
         'pattern',
@@ -23,6 +23,20 @@ export class Level
         'start',
         'action'
     ]
+
+    private StatementWords: Array<string> =
+    [
+        'print',
+        'spawn',
+        'shoot',
+        'health',
+        'spawnat',
+        'move'
+    ]
+
+    private Variables: Array<any> = new Array<any>();
+
+    private Blocks: Array<Block> = new Array<Block>();
 
     public Patterns: Pattern[] =
     [
@@ -90,50 +104,88 @@ export class Level
     {
         // interpet level file
         // ! for testing purposes
-        let file:string = "LEVEL START SPAWN PLAYER END END"
+        let file:string = "LEVEL START PRINT \"KAAS\" END END"
 
+        this.Tokens = file.split(";");
         this.Tokens = file.split(/\s+/);
+        
+        // make all code blocks
+        this.MakeBlockList(this.Tokens)
 
-        // make blocks
-        for(let i:number = 0; i < this.Tokens.length; i++)
-        {
-            switch(this.Tokens[i].toLowerCase())
-            {
-                case "level":
-                    // levelcode
-                break;
-            }
-        }
+        this.BuildLevel();
     }
 
-    private GetBlock(_toProcess:Array<string>) : Array<string>
+    // ! method should be in it's own class
+    private MakeBlockList(_toProcess:Array<string>) : Array<string>
     {
         let _backlog:number = 0;
         let _tokens = new Array<string>();
+        let _startToken:number;
 
         for(let i:number = 0; i < _toProcess.length; i++)
         {
-            if(this.BlockWords.includes(_toProcess[i]))
+            if(this.BlockWords.includes(_toProcess[i].toLowerCase()))
             {
                 _backlog++;
+                _startToken = i;
             }
-            if(_toProcess[i] == "end")
+            if(_toProcess[i].toLowerCase() == "end")
             {
+                _backlog--;
+
                 if(_backlog == 0)
                 {
-                    // cut array here
-                }
+                    let _block:Block = new Block();
+                    let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
 
-                _backlog--;
+                    for(let j:number = 0; j < _blockCode.length; j++)
+                    {
+                        if(this.StatementWords.includes(_blockCode[j].toLowerCase()))
+                        {
+                            let _statement:Statement;
+
+                            switch(_blockCode[j].toLowerCase())
+                            {
+                                case "print":
+                                    _statement = new PrintStatement();
+
+                                    _statement.Arguments.push(_blockCode[j + 1]);
+                                break;
+                            }
+
+                            _block.Commands.push(_statement);
+                        }
+                        else if(this.BlockWords.includes(_blockCode[j].toLowerCase()))
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+
+                    this.Blocks.push(_block);
+                }
             }
         }
+
+        console.log(this.Blocks);
 
         return _tokens;
     }
 
+    private ProcessBlock(_type:string, _block:string) : void
+    {
+
+    }
+
     public BuildLevel() : void
     {
-        
+        for(let i:number = 0; i < this.Blocks.length; i++)
+        {
+            this.Blocks[i].RunBlock();
+        }
     }
 
     public LogicUpdate()
@@ -207,13 +259,33 @@ class SpawnAction extends LevelAction
 }
 
 // ! temporary location
+class Statement
+{
+    public Arguments:Array<any> = new Array<any>();
 
-class Command
+    public Run(): void
+    {
+        // do action
+    }
+}
+
+class PrintStatement extends Statement
 {
     public Run(): void
     {
-
+        console.log(this.Arguments[0]);
     }
+}
 
+class Block
+{
+    public Commands:Array<Statement> = new Array<Statement>();
 
-} 
+    public RunBlock(): void
+    {
+        for(let i:number = 0; i < this.Commands.length; i++)
+        {
+            this.Commands[i].Run();
+        }
+    }
+}
