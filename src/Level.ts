@@ -157,7 +157,8 @@ export class Level
                         }
                         else if(this.BlockWords.includes(_blockCode[j].toLowerCase()))
                         {
-
+                            let _block:Block = new Block();
+                            let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
                         }
                         else
                         {
