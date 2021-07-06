@@ -6,7 +6,7 @@ export class GameManager
 {
     public static GameObjects: GameObject[] = [];
     public static Context: CanvasRenderingContext2D;
-    CurrentLevel: Level;
+    public CurrentLevel: Level;
     timer;
 
     constructor() 

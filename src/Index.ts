@@ -7,4 +7,4 @@ function test() : void
     alert("Hoi!");
 }
 
-window.test = test;
+window.test = test; 

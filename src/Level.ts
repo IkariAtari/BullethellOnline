@@ -36,7 +36,7 @@ export class Level
 
     private Variables: Array<any> = new Array<any>();
 
-    private Blocks: Array<Block> = new Array<Block>();
+    private MasterBlocks: Array<Block> = new Array<Block>();
 
     public Patterns: Pattern[] =
     [
@@ -97,17 +97,18 @@ export class Level
         this.Iteration = 0;
 
         // ! for testing purposes
-        this.Interpet();
     }
 
-    private Interpet() : void
+    public PlayLevel(_code:string) : void
+    {
+        this.Interpet(_code);
+    }
+
+    private Interpet(_code:string) : void
     {
         // interpet level file
-        // ! for testing purposes
-        let file:string = "LEVEL START PRINT \"KAAS\" END END"
-
-        this.Tokens = file.split(";");
-        this.Tokens = file.split(/\s+/);
+        this.Tokens = _code.split(";");
+        this.Tokens = _code.split(/\s+/);
         
         // make all code blocks
         this.MakeBlockList(this.Tokens)
@@ -115,77 +116,110 @@ export class Level
         this.BuildLevel();
     }
 
+    private ProcessBlock(_type:string, _code:Array<string>) : void
+    {
+        let _block:Block = new Block();
+        
+        for(let i:number = 0; i < _code.length; i++)
+        {
+            if(this.StatementWords.includes(_code[i].toLowerCase()))
+            {
+                let _statement:Statement;
+
+                switch(_code[i].toLowerCase())
+                {
+                    case "print":
+                        _statement = new PrintStatement();
+
+                        _statement.Arguments.push(_code[i] + 1]);
+                    break;
+                }
+
+                _block.Commands.push(_statement);
+            }
+            else if(this.BlockWords.includes(_code[i].toLowerCase()))
+            {
+                let _backlog:number = 0;
+                let _block:Block = new Block();
+                //let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    private Block(_code:Array<string>)
+    {
+        for(let i:number = 0; i < _code.length; i++)
+        {
+            // If it is a block
+            if(this.BlockWords.includes(_code[i].toLowerCase()))
+            {    
+                _isDirty = true;
+            }
+            else if(_toProcess[i].toLowerCase() == "end")
+            {
+                _isDirty = false;
+
+                let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
+                let _block:Block = new Block();
+
+                this.ProcessBlock("", _blockCode);
+
+                //this.MasterBlocks.push(_blockCode);
+            }
+            else
+            {
+                // throw cannot process statement outside of master block exception
+            }
+        }
+    }
+
     // ! method should be in it's own class
     private MakeBlockList(_toProcess:Array<string>) : Array<string>
     {
-        let _backlog:number = 0;
+        let _isDirty:boolean = false;
         let _tokens = new Array<string>();
         let _startToken:number;
 
+        // Iterate to each token, this should handle master blocks
         for(let i:number = 0; i < _toProcess.length; i++)
         {
+            // If it is a block
             if(this.BlockWords.includes(_toProcess[i].toLowerCase()))
-            {
-                _backlog++;
+            {     
                 _startToken = i;
+                _isDirty = true;
             }
-            if(_toProcess[i].toLowerCase() == "end")
+            else if(_toProcess[i].toLowerCase() == "end")
             {
-                _backlog--;
+                _isDirty = false;
 
-                if(_backlog == 0)
-                {
-                    let _block:Block = new Block();
-                    let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
+                let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
+                let _block:Block = new Block();
 
-                    for(let j:number = 0; j < _blockCode.length; j++)
-                    {
-                        if(this.StatementWords.includes(_blockCode[j].toLowerCase()))
-                        {
-                            let _statement:Statement;
+                this.ProcessBlock("", _blockCode);
 
-                            switch(_blockCode[j].toLowerCase())
-                            {
-                                case "print":
-                                    _statement = new PrintStatement();
-
-                                    _statement.Arguments.push(_blockCode[j + 1]);
-                                break;
-                            }
-
-                            _block.Commands.push(_statement);
-                        }
-                        else if(this.BlockWords.includes(_blockCode[j].toLowerCase()))
-                        {
-                            let _block:Block = new Block();
-                            let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
-                        }
-                        else
-                        {
-
-                        }
-                    }
-
-                    this.Blocks.push(_block);
-                }
+                //this.MasterBlocks.push(_blockCode);
+            }
+            else
+            {
+                // throw cannot process statement outside of master block exception
             }
         }
-
-        console.log(this.Blocks);
+        
+        console.log(this.MasterBlocks);
 
         return _tokens;
     }
 
-    private ProcessBlock(_type:string, _block:string) : void
-    {
-
-    }
-
     public BuildLevel() : void
     {
-        for(let i:number = 0; i < this.Blocks.length; i++)
+        for(let i:number = 0; i < this.MasterBlocks.length; i++)
         {
-            this.Blocks[i].RunBlock();
+            this.MasterBlocks[i].RunBlock();
         }
     }
 
@@ -280,13 +314,20 @@ class PrintStatement extends Statement
 
 class Block
 {
-    public Commands:Array<Statement> = new Array<Statement>();
+    public Commands:Array<any> = new Array<any>();
 
     public RunBlock(): void
     {
         for(let i:number = 0; i < this.Commands.length; i++)
         {
-            this.Commands[i].Run();
+            if(this.Commands[i] instanceof Statement)
+            {
+                this.Commands[i].Run();
+            }
+            else if(this.Commands[i] instanceof Block)
+            {
+                this.Commands[i].RunBlock();
+            }
         }
     }
 }
