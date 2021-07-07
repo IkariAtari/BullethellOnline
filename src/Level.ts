@@ -116,7 +116,7 @@ export class Level
         this.BuildLevel();
     }
 
-    private ProcessBlock(_type:string, _code:Array<string>) : void
+    private ProcessBlock(_type:string, _code:Array<string>, isMasterBlock:boolean) : void
     {
         let _block:Block = new Block();
         
@@ -131,7 +131,7 @@ export class Level
                     case "print":
                         _statement = new PrintStatement();
 
-                        _statement.Arguments.push(_code[i] + 1]);
+                        _statement.Arguments.push(_code[i + 1]);
                     break;
                 }
 
@@ -139,40 +139,42 @@ export class Level
             }
             else if(this.BlockWords.includes(_code[i].toLowerCase()))
             {
-                let _backlog:number = 0;
-                let _block:Block = new Block();
-                //let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
+                let _newBlock:Array<string> = _code.slice(i, undefined);
+                this.CreateBlock(_newBlock);
             }
             else
             {
 
             }
         }
+
+        if(isMasterBlock)
+        {
+            this.MasterBlocks.push(_block)
+        }
+        
     }
 
-    private Block(_code:Array<string>)
+    private CreateBlock(_code:Array<string>)
     {
+        let _backlog:number = 1;
+
         for(let i:number = 0; i < _code.length; i++)
         {
             // If it is a block
             if(this.BlockWords.includes(_code[i].toLowerCase()))
             {    
-                _isDirty = true;
+                _backlog++;
             }
-            else if(_toProcess[i].toLowerCase() == "end")
+            else if(_code[i].toLowerCase() == "end")
             {
-                _isDirty = false;
+                _backlog--;
 
-                let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
-                let _block:Block = new Block();
-
-                this.ProcessBlock("", _blockCode);
-
-                //this.MasterBlocks.push(_blockCode);
-            }
-            else
-            {
-                // throw cannot process statement outside of master block exception
+                if(_backlog == 0)
+                {
+                    let _blockCode:Array<string> = _code.slice(1, i - 1);
+                    this.ProcessBlock("", _blockCode, false);
+                }
             }
         }
     }
@@ -198,11 +200,8 @@ export class Level
                 _isDirty = false;
 
                 let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
-                let _block:Block = new Block();
 
-                this.ProcessBlock("", _blockCode);
-
-                //this.MasterBlocks.push(_blockCode);
+                this.ProcessBlock("", _blockCode, true);
             }
             else
             {

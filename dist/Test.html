@@ -5,9 +5,9 @@
     <script src="bundle.js"></script>
 
     <form>
-        <textarea rows="4" cols="50">
+        <textarea rows="4" cols="50" id="code">
 
         </textarea>
-        <button type="button" onclick="window.test()">Test Code!</button>
+        <button type="button" onclick="window.test(document.getElementById('code').value)">Test Code!</button>
     </form>
 </html>

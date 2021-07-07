@@ -26,7 +26,7 @@ export class Level {
             'move'
         ];
         this.Variables = new Array();
-        this.Blocks = new Array();
+        this.MasterBlocks = new Array();
         this.Patterns = [
             new Pattern(new Array(new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-2.5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(0, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(2.5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(5, 0.2), 0.2)), 0, "")
         ];
@@ -44,57 +44,78 @@ export class Level {
         ];
         this.Tick = 0;
         this.Iteration = 0;
-        this.Interpet();
     }
-    Interpet() {
-        let file = "LEVEL START PRINT \"KAAS\" END END";
-        this.Tokens = file.split(";");
-        this.Tokens = file.split(/\s+/);
+    PlayLevel(_code) {
+        this.Interpet(_code);
+    }
+    Interpet(_code) {
+        this.Tokens = _code.split(";");
+        this.Tokens = _code.split(/\s+/);
         this.MakeBlockList(this.Tokens);
         this.BuildLevel();
     }
+    ProcessBlock(_type, _code, isMasterBlock) {
+        let _block = new Block();
+        for (let i = 0; i < _code.length; i++) {
+            if (this.StatementWords.includes(_code[i].toLowerCase())) {
+                let _statement;
+                switch (_code[i].toLowerCase()) {
+                    case "print":
+                        _statement = new PrintStatement();
+                        _statement.Arguments.push(_code[i + 1]);
+                        break;
+                }
+                _block.Commands.push(_statement);
+            }
+            else if (this.BlockWords.includes(_code[i].toLowerCase())) {
+                let _newBlock = _code.slice(i, undefined);
+                this.CreateBlock(_newBlock);
+            }
+            else {
+            }
+        }
+        if (isMasterBlock) {
+            this.MasterBlocks.push(_block);
+        }
+    }
+    CreateBlock(_code) {
+        let _backlog = 1;
+        for (let i = 0; i < _code.length; i++) {
+            if (this.BlockWords.includes(_code[i].toLowerCase())) {
+                _backlog++;
+            }
+            else if (_code[i].toLowerCase() == "end") {
+                _backlog--;
+                if (_backlog == 0) {
+                    let _blockCode = _code.slice(1, i - 1);
+                    this.ProcessBlock("", _blockCode, false);
+                }
+            }
+        }
+    }
     MakeBlockList(_toProcess) {
-        let _backlog = 0;
+        let _isDirty = false;
         let _tokens = new Array();
         let _startToken;
         for (let i = 0; i < _toProcess.length; i++) {
             if (this.BlockWords.includes(_toProcess[i].toLowerCase())) {
-                _backlog++;
                 _startToken = i;
+                _isDirty = true;
             }
-            if (_toProcess[i].toLowerCase() == "end") {
-                _backlog--;
-                if (_backlog == 0) {
-                    let _block = new Block();
-                    let _blockCode = _toProcess.slice(_startToken + 1, i - 1);
-                    for (let j = 0; j < _blockCode.length; j++) {
-                        if (this.StatementWords.includes(_blockCode[j].toLowerCase())) {
-                            let _statement;
-                            switch (_blockCode[j].toLowerCase()) {
-                                case "print":
-                                    _statement = new PrintStatement();
-                                    _statement.Arguments.push(_blockCode[j + 1]);
-                                    break;
-                            }
-                            _block.Commands.push(_statement);
-                        }
-                        else if (this.BlockWords.includes(_blockCode[j].toLowerCase())) {
-                        }
-                        else {
-                        }
-                    }
-                    this.Blocks.push(_block);
-                }
+            else if (_toProcess[i].toLowerCase() == "end") {
+                _isDirty = false;
+                let _blockCode = _toProcess.slice(_startToken + 1, i - 1);
+                this.ProcessBlock("", _blockCode, true);
+            }
+            else {
             }
         }
-        console.log(this.Blocks);
+        console.log(this.MasterBlocks);
         return _tokens;
     }
-    ProcessBlock(_type, _block) {
-    }
     BuildLevel() {
-        for (let i = 0; i < this.Blocks.length; i++) {
-            this.Blocks[i].RunBlock();
+        for (let i = 0; i < this.MasterBlocks.length; i++) {
+            this.MasterBlocks[i].RunBlock();
         }
     }
     LogicUpdate() {
@@ -153,7 +174,12 @@ class Block {
     }
     RunBlock() {
         for (let i = 0; i < this.Commands.length; i++) {
-            this.Commands[i].Run();
+            if (this.Commands[i] instanceof Statement) {
+                this.Commands[i].Run();
+            }
+            else if (this.Commands[i] instanceof Block) {
+                this.Commands[i].RunBlock();
+            }
         }
     }
 }

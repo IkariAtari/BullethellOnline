@@ -1,10 +1,11 @@
 import { GameManager } from "./Core/GameManager";
 
-new GameManager();
+let gm = new GameManager();
 
-function test() : void
+function test(code:string) : void
 {
-    alert("Hoi!");
+    console.log(code);
+    gm.CurrentLevel.PlayLevel(code);
 }
 
 window.test = test; 
