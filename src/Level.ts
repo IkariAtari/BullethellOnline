@@ -1,3 +1,4 @@
+import { runInContext } from "vm";
 import { Bullet } from "./Bullet";
 import { BoxCollider } from "./Core/Collider";
 import { GameManager } from "./Core/GameManager";
@@ -15,11 +16,6 @@ export class Level
 
     private BlockWords: Array<string> = 
     [
-        'bullet',
-        'pattern',
-        'enemy',
-        'path',
-        'level',
         'start',
         'action'
     ]
@@ -34,59 +30,23 @@ export class Level
         'move'
     ]
 
+    private RootBlockWords: Array<string> =
+    [
+        'bullet',
+        'pattern',
+        'enemy',
+        'path',
+        'level'
+    ]
+
     private Variables: Array<any> = new Array<any>();
 
     private MasterBlocks: Array<Block> = new Array<Block>();
 
-    public Patterns: Pattern[] =
-    [
-        new Pattern(
-            new Array(
-                new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-5, 0.2), 0.2),
-                new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-2.5, 0.2), 0.2),
-                new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(0, 0.2), 0.2),
-                new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(2.5, 0.2), 0.2),
-                new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(5, 0.2), 0.2)
-            ),
-            0,
-            ""
-        )
-    ];
+    public Patterns: Array<Pattern>;
+   
 
-    public Level: LevelTick[] = 
-    [
-       new LevelTick(
-            0, 
-            new SpawnAction(
-                new Player(
-                    new Point(40, 40), 
-                    new Rect(10, 10, "green"), 
-                    new BoxCollider(10, 10, new Point(40, 40))
-                )
-            )
-        ),
-        new LevelTick(
-            500, 
-            new SpawnAction(
-                new Enemy(
-                    100, 
-                    new Rect(10, 10, "purple"), 
-                    new BoxCollider(10, 10, new Point(40, 10)),
-                    10,
-                    new EnemyPath([
-                        ["move", 10, new Point(150, 200)],
-                        ["move", 50, new Point(400, 100)],
-                        ["shoot", 55, this.Patterns[0]],
-                        ["shoot", 60, this.Patterns[0]],
-                        ["shoot", 70, this.Patterns[0]],
-                        ["shoot", 80, this.Patterns[0]],
-                        ["shoot", 90, this.Patterns[0]]
-                    ]),
-                    0.1
-                )
-            )
-        ),
-    ];
+    public Level: Array<LevelTick>; 
 
     public Tick: number;
     private Iteration: number;
@@ -116,15 +76,16 @@ export class Level
         this.BuildLevel();
     }
 
-    private ProcessBlock(_type:string, _code:Array<string>, isMasterBlock:boolean) : void
+    private ProcessBlock(_type:string, _code:Array<string>, isMasterBlock:boolean, referenceBlock:Block = undefined) : void
     {
         let _block:Block = new Block();
-        
+
         for(let i:number = 0; i < _code.length; i++)
         {
             if(this.StatementWords.includes(_code[i].toLowerCase()))
             {
                 let _statement:Statement;
+                _statement.ParentBlock = _block;
 
                 switch(_code[i].toLowerCase())
                 {
@@ -139,12 +100,30 @@ export class Level
             }
             else if(this.BlockWords.includes(_code[i].toLowerCase()))
             {
-                let _newBlock:Array<string> = _code.slice(i, undefined);
-                this.CreateBlock(_newBlock);
+                switch(_code[i].toLowerCase())
+                {
+                    case "start":
+
+                    break;
+
+                    case "action":
+                        //this.Level.push(new LevelTick(parseInt(_code[i + 1])), )
+                    break;
+                }
+
+                let _newBlock:Array<string> = _code.slice(i);
+
+                let _processedBlock:Array<string> = this.CreateBlock(_newBlock);
+
+                this.ProcessBlock("", _processedBlock, false, _block);
+            }
+            else if(this.RootBlockWords.includes(_code[i].toLowerCase()))
+            {
+                // cannot make root block in block error
             }
             else
             {
-
+                // throw invalid keyword error
             }
         }
 
@@ -152,10 +131,16 @@ export class Level
         {
             this.MasterBlocks.push(_block)
         }
-        
+        else
+        {
+            if(referenceBlock != undefined)
+            {
+                referenceBlock.Commands.push(_block);
+            }
+        }
     }
 
-    private CreateBlock(_code:Array<string>)
+    private CreateBlock(_code:Array<string>) : Array<string>
     {
         let _backlog:number = 1;
 
@@ -172,46 +157,37 @@ export class Level
 
                 if(_backlog == 0)
                 {
-                    let _blockCode:Array<string> = _code.slice(1, i - 1);
-                    this.ProcessBlock("", _blockCode, false);
+                    let _blockCode:Array<string> = _code.slice(1, i);
+
+                    if(_blockCode.length == 0)
+                    {
+                        _blockCode.push(" ");
+                    }
+                          
+                    return _blockCode;
                 }
             }
         }
     }
 
     // ! method should be in it's own class
-    private MakeBlockList(_toProcess:Array<string>) : Array<string>
+    private MakeBlockList(_toProcess:Array<string>)
     {
-        let _isDirty:boolean = false;
-        let _tokens = new Array<string>();
-        let _startToken:number;
-
         // Iterate to each token, this should handle master blocks
         for(let i:number = 0; i < _toProcess.length; i++)
         {
             // If it is a block
-            if(this.BlockWords.includes(_toProcess[i].toLowerCase()))
-            {     
-                _startToken = i;
-                _isDirty = true;
-            }
-            else if(_toProcess[i].toLowerCase() == "end")
+            if(this.RootBlockWords.includes(_toProcess[i]))
             {
-                _isDirty = false;
+                let _blockCode = _toProcess.slice(i, undefined)
+                
+                _blockCode = this.CreateBlock(_blockCode);
 
-                let _blockCode:Array<string> = _toProcess.slice(_startToken + 1, i - 1);
-
-                this.ProcessBlock("", _blockCode, true);
-            }
-            else
-            {
-                // throw cannot process statement outside of master block exception
+                this.ProcessBlock("", _blockCode, true);    
             }
         }
         
         console.log(this.MasterBlocks);
-
-        return _tokens;
     }
 
     public BuildLevel() : void
@@ -228,7 +204,10 @@ export class Level
         {
             if(this.Iteration == this.Level[this.Tick].AtTime)
             {
-                this.Level[this.Tick].Action.Action();
+                for(let i:number = 0; i < this.Level[this.Tick].Actions.length; i++)
+                {
+                    this.Level[this.Tick].Actions[i].Action();
+                }
                 
                 this.Tick++;
             }
@@ -260,12 +239,11 @@ class LevelTick
     public AtTime: number;
     
     // Needs to be array of level actions
-    public Action: LevelAction;
+    public Actions: Array<LevelAction>;
 
-    constructor(AtTime: number, Action: LevelAction)
+    constructor(AtTime: number)
     {
         this.AtTime = AtTime;
-        this.Action = Action;
 
         console.log("Initated level action at: " + this.AtTime.toString());
     }
@@ -296,6 +274,7 @@ class SpawnAction extends LevelAction
 class Statement
 {
     public Arguments:Array<any> = new Array<any>();
+    public ParentBlock:Block;
 
     public Run(): void
     {
@@ -308,6 +287,25 @@ class PrintStatement extends Statement
     public Run(): void
     {
         console.log(this.Arguments[0]);
+    }
+}
+
+class SpawnStatement extends Statement
+{
+    public Run(): void
+    {
+        if(super.ParentBlock instanceof StartBlock)
+        {
+            if(this.Arguments[0] == "player")
+            {
+                super.ParentBlock.Tick.Actions.push(new SpawnAction(new Player(new Point(40, 40), new Rect(10, 10, "green"), new BoxCollider(10, 10, new Point(40, 40)))))
+            }
+            
+        }
+        else
+        {
+            // throw error that this statement cannot be run outside a start or action block
+        }
     }
 }
 
@@ -328,5 +326,18 @@ class Block
                 this.Commands[i].RunBlock();
             }
         }
+    }
+}
+
+/*
+ * There always needs to be one start block in the level
+ */
+class StartBlock extends Block
+{
+    public Tick:LevelTick = new LevelTick(0);
+
+    public RunBlock(): void
+    {
+        super.RunBlock();
     }
 }

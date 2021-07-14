@@ -14,7 +14,6 @@ export class GameManager {
         for (let i = 0; i < GameManager.GameObjects.length; i++) {
             if (GameManager.GameObjects[i].ID == GameObject.ID) {
                 GameManager.GameObjects.splice(i, 1);
-                console.log(GameManager.GameObjects);
             }
         }
     }

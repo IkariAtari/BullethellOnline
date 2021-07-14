@@ -1,19 +1,11 @@
-import { Bullet } from "./Bullet";
 import { BoxCollider } from "./Core/Collider";
 import { GameManager } from "./Core/GameManager";
 import { Rect } from "./Core/Graphic";
 import { Point } from "./Core/Point";
-import { Enemy, EnemyPath } from "./Enemy";
-import { Pattern } from "./Pattern";
 import { Player } from "./Player";
 export class Level {
     constructor() {
         this.BlockWords = [
-            'bullet',
-            'pattern',
-            'enemy',
-            'path',
-            'level',
             'start',
             'action'
         ];
@@ -25,23 +17,15 @@ export class Level {
             'spawnat',
             'move'
         ];
+        this.RootBlockWords = [
+            'bullet',
+            'pattern',
+            'enemy',
+            'path',
+            'level'
+        ];
         this.Variables = new Array();
         this.MasterBlocks = new Array();
-        this.Patterns = [
-            new Pattern(new Array(new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(-2.5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(0, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(2.5, 0.2), 0.2), new Bullet(new Point(0, 0), new Rect(5, 5, "purple"), new BoxCollider(5, 5, new Point(0, 0)), "EnemyBullet", new Point(5, 0.2), 0.2)), 0, "")
-        ];
-        this.Level = [
-            new LevelTick(0, new SpawnAction(new Player(new Point(40, 40), new Rect(10, 10, "green"), new BoxCollider(10, 10, new Point(40, 40))))),
-            new LevelTick(500, new SpawnAction(new Enemy(100, new Rect(10, 10, "purple"), new BoxCollider(10, 10, new Point(40, 10)), 10, new EnemyPath([
-                ["move", 10, new Point(150, 200)],
-                ["move", 50, new Point(400, 100)],
-                ["shoot", 55, this.Patterns[0]],
-                ["shoot", 60, this.Patterns[0]],
-                ["shoot", 70, this.Patterns[0]],
-                ["shoot", 80, this.Patterns[0]],
-                ["shoot", 90, this.Patterns[0]]
-            ]), 0.1))),
-        ];
         this.Tick = 0;
         this.Iteration = 0;
     }
@@ -54,11 +38,12 @@ export class Level {
         this.MakeBlockList(this.Tokens);
         this.BuildLevel();
     }
-    ProcessBlock(_type, _code, isMasterBlock) {
+    ProcessBlock(_type, _code, isMasterBlock, referenceBlock = undefined) {
         let _block = new Block();
         for (let i = 0; i < _code.length; i++) {
             if (this.StatementWords.includes(_code[i].toLowerCase())) {
                 let _statement;
+                _statement.ParentBlock = _block;
                 switch (_code[i].toLowerCase()) {
                     case "print":
                         _statement = new PrintStatement();
@@ -68,14 +53,28 @@ export class Level {
                 _block.Commands.push(_statement);
             }
             else if (this.BlockWords.includes(_code[i].toLowerCase())) {
-                let _newBlock = _code.slice(i, undefined);
-                this.CreateBlock(_newBlock);
+                switch (_code[i].toLowerCase()) {
+                    case "start":
+                        break;
+                    case "action":
+                        break;
+                }
+                let _newBlock = _code.slice(i);
+                let _processedBlock = this.CreateBlock(_newBlock);
+                this.ProcessBlock("", _processedBlock, false, _block);
+            }
+            else if (this.RootBlockWords.includes(_code[i].toLowerCase())) {
             }
             else {
             }
         }
         if (isMasterBlock) {
             this.MasterBlocks.push(_block);
+        }
+        else {
+            if (referenceBlock != undefined) {
+                referenceBlock.Commands.push(_block);
+            }
         }
     }
     CreateBlock(_code) {
@@ -87,31 +86,24 @@ export class Level {
             else if (_code[i].toLowerCase() == "end") {
                 _backlog--;
                 if (_backlog == 0) {
-                    let _blockCode = _code.slice(1, i - 1);
-                    this.ProcessBlock("", _blockCode, false);
+                    let _blockCode = _code.slice(1, i);
+                    if (_blockCode.length == 0) {
+                        _blockCode.push(" ");
+                    }
+                    return _blockCode;
                 }
             }
         }
     }
     MakeBlockList(_toProcess) {
-        let _isDirty = false;
-        let _tokens = new Array();
-        let _startToken;
         for (let i = 0; i < _toProcess.length; i++) {
-            if (this.BlockWords.includes(_toProcess[i].toLowerCase())) {
-                _startToken = i;
-                _isDirty = true;
-            }
-            else if (_toProcess[i].toLowerCase() == "end") {
-                _isDirty = false;
-                let _blockCode = _toProcess.slice(_startToken + 1, i - 1);
+            if (this.RootBlockWords.includes(_toProcess[i])) {
+                let _blockCode = _toProcess.slice(i, undefined);
+                _blockCode = this.CreateBlock(_blockCode);
                 this.ProcessBlock("", _blockCode, true);
-            }
-            else {
             }
         }
         console.log(this.MasterBlocks);
-        return _tokens;
     }
     BuildLevel() {
         for (let i = 0; i < this.MasterBlocks.length; i++) {
@@ -121,7 +113,9 @@ export class Level {
     LogicUpdate() {
         if (this.Tick < this.Level.length) {
             if (this.Iteration == this.Level[this.Tick].AtTime) {
-                this.Level[this.Tick].Action.Action();
+                for (let i = 0; i < this.Level[this.Tick].Actions.length; i++) {
+                    this.Level[this.Tick].Actions[i].Action();
+                }
                 this.Tick++;
             }
         }
@@ -139,9 +133,8 @@ export class Level {
     }
 }
 class LevelTick {
-    constructor(AtTime, Action) {
+    constructor(AtTime) {
         this.AtTime = AtTime;
-        this.Action = Action;
         console.log("Initated level action at: " + this.AtTime.toString());
     }
 }
@@ -168,6 +161,17 @@ class PrintStatement extends Statement {
         console.log(this.Arguments[0]);
     }
 }
+class SpawnStatement extends Statement {
+    Run() {
+        if (super.ParentBlock instanceof StartBlock) {
+            if (this.Arguments[0] == "player") {
+                super.ParentBlock.Tick.Actions.push(new SpawnAction(new Player(new Point(40, 40), new Rect(10, 10, "green"), new BoxCollider(10, 10, new Point(40, 40)))));
+            }
+        }
+        else {
+        }
+    }
+}
 class Block {
     constructor() {
         this.Commands = new Array();
@@ -181,6 +185,15 @@ class Block {
                 this.Commands[i].RunBlock();
             }
         }
+    }
+}
+class StartBlock extends Block {
+    constructor() {
+        super(...arguments);
+        this.Tick = new LevelTick(0);
+    }
+    RunBlock() {
+        super.RunBlock();
     }
 }
 //# sourceMappingURL=Level.js.map

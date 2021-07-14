@@ -34,7 +34,7 @@ export class GameManager
             {
                 GameManager.GameObjects.splice(i, 1);
 
-                console.log(GameManager.GameObjects);
+                //console.log(GameManager.GameObjects);
             }
         }
     }
