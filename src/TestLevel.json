@@ -3,17 +3,49 @@
         "LevelName" : "Test",
         "Author" : "Ikari",
 
-        "Pattern" : {
-            "Name" : "Pattern1",
+        "Imports" : [
+            {
+                "Type" : "Pattern",
+                "URL" : "USER::PATTERNNAME"
+            },
+            {
+                "Type" : "Enemy",
+                "URL" : "USER::ENEMYNAME"
+            }
+        ],
 
-            "Bullets" :
-            [
-                ["0,0", "GraphicType", "2", "EnemyBullet", "-5,0.2", "0.3"]
-            ],
+        "Patterns" : [
+            {
+                "Name" : "Pattern1",
 
-            "Interval" : "2",
-            "Repeat" : "5"
-        },
+                "Bullets" :
+                [
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "-1,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "-0.9,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "-0.6,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "-0.3,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "0,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "0.3,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "-0.6,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "0.9,1", "5"],
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "1,1", "5"]
+                ],
+
+                "Interval" : "2",
+                "Repeat" : "5"
+            },
+            {
+                "Name" : "Pattern2",
+
+                "Bullets" :
+                [
+                    ["0,0", "GraphicType", "2", "EnemyBullet", "-5,0.2", "0.3"]
+                ],
+
+                "Interval" : "2",
+                "Repeat" : "5"
+            }
+        ],
 
         "Enemy" : {
 
@@ -21,35 +53,120 @@
 
         "Level" : {
             "0" : {
-                "SpawnAction" : {
-                    "Type" : "Player",
-                    "Position" : "0,0"
-                }
+                "Actions" : [
+                    {
+                        "ActionType" : "SpawnAction",
+                        "SpawnType" : "Player",
+                        "Position" : "400,700"
+                    },
+                    {
+                        "ActionType" : "Declare",
+                        "Name" : "Var1", 
+                        "Value" : "0"
+                    },
+                    {
+                        "ActionType" : "Declare",
+                        "Name" : "Var2", 
+                        "Value" : "50"
+                    },
+                    {
+                        "ActionType" : "Execute",
+                        "Code" : 
+                        [
+                            ["AddVar", ["Var1", "Var1"]]
+                        ]
+                    },
+                    {
+                        "ActionType" : "ConsoleLog",
+                        "Message" : "Test!"
+                    },
+                    {
+                        "ActionType" : "ConsoleLog",
+                        "Message" : "Test!"
+                    },
+                    {
+                        "ActionType" : "ConsoleLog",
+                        "Message" : "Test!"
+                    },
+                    {
+                        "ActionType" : "ConsoleLog",
+                        "Message" : "Test!"
+                    },
+                    {
+                        "ActionType" : "ConsoleLog",
+                        "Message" : "Test!"
+                    }
+                ]
             },
 
-            "2" : {
-                "SpawnActon" : {
-                    "Type" : "Enemy",
-                    "Position" : "0",
-                    "Enemys" : [
-                        {
-                            "Graphic" : "GraphicName",
-                            "Health" : "100",
-                            "EnemyPath" : [
-                                ["Move", "4,5", "10"],
-                                ["Shoot", "Pattern1"]
-                            ]
-                        },
-                        {
-                            "Graphic" : "GraphicName",
-                            "Health" : "100",
-                            "EnemyPath" : [
-                                ["Move", "4,5", "10"],
-                                ["Shoot", "Pattern1"]
-                            ]
-                        }
-                    ]
-                }
+            "50" : {
+                "Actions" : [
+                    {
+                        "ActionType" : "SpawnAction",
+                        "SpawnType" : "Enemy",
+                        "Enemies" : [
+                            {
+                                "Graphic" : "GraphicName",
+                                "Health" : "100",
+                                "Position" : "100",
+                                "StartSpeed" : "10",
+                                "EnemyPath" : [
+                                    ["Move", "5", "400,500", "10"],
+                                    ["Shoot", "50", "Pattern1"]
+                                ] 
+                            },
+                            {
+                                "Graphic" : "GraphicName",
+                                "Health" : "100",
+                                "Position" : "50",
+                                "StartSpeed" : "10",
+                                "EnemyPath" : [
+                                    ["DeclareVar", "0", "VARNAME", "VALUE"],
+                                    ["Move", "15","300,500", "10"],
+                                    ["Shoot", "100", "Pattern1"],
+                                    ["SetVar", "20", "VARNAME", "VALUE"],
+                                    ["RepeatShoot", "40", "0:VAR", "Pattern1"],
+                                    ["EndRepeatShoot", "60", "0"]
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+            "100" : {
+                "Actions" : [
+                    {
+                        "ActionType" : "SpawnAction",
+                        "SpawnType" : "Enemy",
+                        "Enemies" : [
+                            {
+                                "Graphic" : "GraphicName",
+                                "Health" : "100",
+                                "Position" : "100",
+                                "StartSpeed" : "10",
+                                "EnemyPath" : [
+                                    ["Move", "5", "400,500", "10"],
+                                    ["Shoot", "50", "Pattern1"]
+                                ] 
+                            },
+                            {
+                                "Graphic" : "GraphicName",
+                                "Health" : "100",
+                                "Position" : "50",
+                                "StartSpeed" : "10",
+                                "EnemyPath" : [
+                                    ["DeclareVar", "0", "VARNAME", "VALUE"],
+                                    ["Move", "15","300,500", "10"],
+                                    ["Shoot", "100", "Pattern1"],
+                                    ["SetVar", "20", "VARNAME", "VALUE"],
+                                    ["RepeatShoot", "40", "0:VAR", "Pattern1"],
+                                    ["EndRepeatShoot", "60", "0"]
+                                ]
+                            }
+                        ]
+                    }
+                ]
             }
         }
     }

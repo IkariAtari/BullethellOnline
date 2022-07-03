@@ -31,7 +31,7 @@ export class Player extends GameObject {
         if (" " in Input.KeysDown) {
             if (this.ShootTimerValue <= 0) {
                 let value = Math.sin(this.Counter);
-                this.CurrentAngle = 270 + value * 10;
+                this.CurrentAngle = 270;
                 GameManager.Instantiate(new Bullet(this.Position, new Rect(5, 5, "red"), new BoxCollider(5, 5, this.Position), "PlayerBullet", Point.AngleToHeading(this.CurrentAngle), 3.5));
                 this.Counter += 1;
                 this.ShootTimerValue = this.ShootTimer;

@@ -6,6 +6,7 @@ export class Bullet extends GameObject {
         super(Posistion, Graphic, Collider);
         this.Tag = Tag;
         this.Velocity = Point.Mult(Point.Normalize(Direction), Speed);
+        console.log(Speed);
     }
     LogicUpdate() {
         super.LogicUpdate();

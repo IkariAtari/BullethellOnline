@@ -3,6 +3,10 @@ import { GameObject } from "./Core/GameObject";
 import { Point } from "./Core/Point";
 import { Graphic } from './Core/Graphic';
 import { GameManager } from "./Core/GameManager";
+import { GameConsole } from "./Core/GameConsole";
+import { Level } from "./Level";
+import { Pattern } from "./Pattern";
+import { Console } from "console";
 
 export class Enemy extends GameObject 
 {
@@ -18,9 +22,11 @@ export class Enemy extends GameObject
     public Tick: number;
     public Iteration: number;
 
-    constructor(Position: number, Graphic: Graphic, Collider: BoxCollider, Health: number, Path: EnemyPath, Speed: number) 
+    private isLocked: boolean = false;
+
+    constructor(Position: Point, Graphic: Graphic, Collider: BoxCollider, Health: number, Path: EnemyPath, Speed: number) 
     {
-        super(new Point(Position, -10), Graphic, Collider);
+        super(Position, Graphic, Collider);
 
         this.Health = Health;
         this.Path = Path;
@@ -41,23 +47,36 @@ export class Enemy extends GameObject
             GameManager.RemoveGameObject(this);
         }
 
+        if(this.Path.Actions === undefined)
+        {
+            return;
+        }
+
+        // Run async
+
         if (this.Tick < this.Path.Actions.length) 
         {
-            if (this.Iteration == this.Path.Actions[this.Tick][1]) 
+            if (this.Iteration == parseInt(this.Path.Actions[this.Tick][1])) 
             {
                 switch (this.Path.Actions[this.Tick][0]) 
                 {
-                    case "move":
-                        this.Target = this.Path.Actions[this.Tick][2];
+                    case "Move":
+                        this.Target = Point.DecodePoint(this.Path.Actions[this.Tick][2]);
 
                         //console.log(Point.Normalize(Point.Direction(this.Position, this.Target)));
                         break;
 
-                    case "speed":
+                    case "Speed":
 
                         break;
-                    case "shoot" :
-                            let pattern = this.Path.Actions[this.Tick][2];
+                    case "Shoot" :
+                            // Get pattern from level
+
+                            // Create new instance from already made instance, maybe works, maybe
+                            let pattern: Pattern = Object.assign(new Pattern(new Array(), 0, ""), Level.Patterns.get(this.Path.Actions[this.Tick][2]));
+
+                            console.log(pattern);
+
                             pattern.Fire(this.Position);
                         break;
 
@@ -69,32 +88,51 @@ export class Enemy extends GameObject
 
                         break
 
+                    case "SetVar" :
+
+                        break
+
                     default:
-                        console.log("No valid action assigned");
-                        break;
+                        GameConsole.LogWarning(`No such enemy command: <b>${this.Path.Actions[this.Tick][0]}</b>`)
+                    break;
                 }
 
                 this.Tick += 1;
             }
         }
 
+        // Move towards target, it will always try to move towards something, if there's no target it will stay still
+        if(this.Target != undefined)
+        {
+            let dir = Point.Direction(this.Position, this.Target) as Point;
+            this.Position = Point.Add(this.Position, Point.Normalize(new Point(dir.x * this.Speed, dir.y * this.Speed)));
+        }
+
         this.Iteration += 1;
-        let dir = Point.Direction(this.Position, this.Target) as Point;
-        this.Position = Point.Add(this.Position, Point.Normalize(new Point(dir.x * this.Speed, dir.y * this.Speed)));
+    }
+
+    private MoveRoutine(): void
+    {
+
     }
 
 
-    public Hurt(Damage: number) 
+    public Hurt(Damage: number): void 
     {
         this.Health -= Damage;
+    }
+
+    public static GetSpawnPosition(x: number): Point
+    {
+        return new Point(x, -10);
     }
 }
 
 export class EnemyPath 
 {
-    public Actions: any[][];
+    public Actions: string[][];
 
-    constructor(Actions: any[][]) 
+    constructor(Actions: string[][]) 
     {
         this.Actions = Actions;
     }

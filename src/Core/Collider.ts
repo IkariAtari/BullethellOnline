@@ -1,4 +1,4 @@
-import { Rect } from "./Graphic";
+import { Rect } from "./Rect";
 import { Point } from "./Point";
 
 abstract class Collider 
@@ -42,4 +42,4 @@ export class BoxCollider extends Collider
             return false;
         }
     }
-}0.
+}

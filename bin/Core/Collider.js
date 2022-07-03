@@ -1,4 +1,4 @@
-import { Rect } from "./Graphic";
+import { Rect } from "./Rect";
 class Collider {
     constructor() { }
     CheckCollision(a) {
@@ -22,5 +22,4 @@ export class BoxCollider extends Collider {
         }
     }
 }
-0.;
 //# sourceMappingURL=Collider.js.map

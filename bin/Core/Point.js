@@ -29,5 +29,12 @@ export class Point {
         let Radians = a * (Math.PI / 180);
         return new Point(Number(Math.cos(Radians).toFixed(10)), Number(Math.sin(Radians).toFixed(10)));
     }
+    static DecodePoint(code) {
+        let _point = code.split(",");
+        if (_point.length > 2) {
+            return new Point(0, 0);
+        }
+        return new Point(parseFloat(_point[0]), parseFloat(_point[1]));
+    }
 }
 //# sourceMappingURL=Point.js.map

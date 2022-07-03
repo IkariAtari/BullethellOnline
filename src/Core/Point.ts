@@ -54,4 +54,16 @@ export class Point
 
         return new Point(Number(Math.cos(Radians).toFixed(10)), Number(Math.sin(Radians).toFixed(10)));
     }
+
+    public static DecodePoint(code: string): Point
+    {
+        let _point: string[] = code.split(",");
+
+        if(_point.length > 2)
+        {
+            return new Point(0, 0);
+        }
+
+        return new Point(parseFloat(_point[0]), parseFloat(_point[1]));
+    }
 }

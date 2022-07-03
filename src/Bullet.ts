@@ -8,13 +8,19 @@ import { GameManager } from './Core/GameManager';
 export class Bullet extends GameObject 
 {
     public Velocity: Point;
+    public Direction: Point;
+    public Speed: number;
 
     constructor(Posistion: Point, Graphic: Graphic, Collider: BoxCollider, Tag: string, Direction: Point, Speed: number) 
     {
         super(Posistion, Graphic, Collider);
 
         this.Tag = Tag;
+
+
         this.Velocity = Point.Mult(Point.Normalize(Direction), Speed);
+
+        console.log(Speed);
     }
 
     public LogicUpdate(): void 
@@ -22,7 +28,7 @@ export class Bullet extends GameObject
         super.LogicUpdate();
         
         // TODO: move by heading, and path
-        //this.Velocity = Point.Mult(Point.Normalize(Direction), Speed);
+        //this.Velocity = Point.Mult(Point.Normalize(this.Direction), this.Speed);
         
         this.Position = Point.Add(this.Position, this.Velocity);
 

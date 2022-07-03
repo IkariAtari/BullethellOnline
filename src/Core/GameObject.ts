@@ -14,6 +14,9 @@ export class GameObject extends Behaviour
 
     public Position: Point;
 
+    // Angle for now, ofcourse a dedicated Transform class can be made
+    public Rotation: number;
+
     public Graphic: Graphic;
 
     public Collider: BoxCollider;
@@ -43,6 +46,11 @@ export class GameObject extends Behaviour
     public Start(): void 
     {
 
+    }
+
+    public RotateToAngle(Angle: number)
+    {
+        
     }
 
     public LogicUpdate(): void 
