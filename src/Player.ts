@@ -39,7 +39,7 @@ export class Player extends GameObject
         {
             this.Position.y += 1;
         }
-        if (" " in Input.KeysDown) 
+        if ("keyz" in Input.KeysDown) 
         {
             if (this.ShootTimerValue <= 0) 
             {   
@@ -50,9 +50,7 @@ export class Player extends GameObject
                 //{
                     GameManager.Instantiate(new Bullet(this.Position, new Rect(5, 5, "red"), new BoxCollider(5, 5, this.Position), "PlayerBullet", Point.AngleToHeading(this.CurrentAngle), 3.5));
                 //}
-
-                
-                
+ 
                 this.Counter += 1;
                 //console.log("Current Angle: "+this.CurrentAngle);
                 this.ShootTimerValue = this.ShootTimer;

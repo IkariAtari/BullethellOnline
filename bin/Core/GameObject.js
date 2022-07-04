@@ -17,6 +17,8 @@ export class GameObject extends Behaviour {
     }
     Start() {
     }
+    RotateToAngle(Angle) {
+    }
     LogicUpdate() {
         this.Graphic.Position = this.Position;
         this.Collider.Posistion = this.Position;

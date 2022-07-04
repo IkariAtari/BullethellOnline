@@ -8,5 +8,5 @@ export class PrintStatement extends Statement implements IRunnable
         console.log(this.Arguments[0]);
     }
 
-    static { console.log("Static clause test"); }
+    // static { console.log("Static clause test"); }
 }

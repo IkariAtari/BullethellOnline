@@ -28,7 +28,7 @@ export class Player extends GameObject {
         if ("arrowdown" in Input.KeysDown) {
             this.Position.y += 1;
         }
-        if (" " in Input.KeysDown) {
+        if ("keyz" in Input.KeysDown) {
             if (this.ShootTimerValue <= 0) {
                 let value = Math.sin(this.Counter);
                 this.CurrentAngle = 270;

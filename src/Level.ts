@@ -159,7 +159,6 @@ export class Level
                     case "Execute" :
                         // Level code executions will be run at runtime
 
-
                     break;
                     default:
 
@@ -246,6 +245,10 @@ export class Level
         {
             return;
         }
+
+        // Draw the backgrounds
+        GameManager.Context.fillStyle = "black"
+        GameManager.Context.fillRect(0, 0, GameManager.GameWidth, GameManager.GameHeight);
 
         for (let i = 0; i < GameManager.GameObjects.length; i++)
         {

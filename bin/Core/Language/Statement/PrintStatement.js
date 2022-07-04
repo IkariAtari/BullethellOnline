@@ -4,7 +4,4 @@ export class PrintStatement extends Statement {
         console.log(this.Arguments[0]);
     }
 }
-{
-    console.log("Static clause test");
-}
 //# sourceMappingURL=PrintStatement.js.map

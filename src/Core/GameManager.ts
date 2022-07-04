@@ -11,6 +11,8 @@ export class GameManager
 {
     public static GameObjects: GameObject[] = [];  
     public static Context: CanvasRenderingContext2D;
+    public static GameWidth: number;
+    public static GameHeight: number;
 
     public static isDebug: boolean = true;
     public CurrentLevel: Level;
@@ -21,7 +23,10 @@ export class GameManager
         console.log("Game instance created");
         
         GameManager.Context = document.getElementById("canvas").getContext("2d");
+        let _canvas: HTMLElement = document.getElementById("canvas")
 
+        GameManager.GameWidth = _canvas.clientWidth;
+        GameManager.GameHeight = _canvas.clientHeight;
         GameConsole.LOG_AREA = document.getElementById("console");
 
         this.CurrentLevel = new Level();

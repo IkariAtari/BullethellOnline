@@ -84,17 +84,19 @@ export class Enemy extends GameObject
 
                         break;
                     
-                    case "StopInterval" :
+                    case "StopInterval":
 
-                        break
+                        break;
 
-                    case "SetVar" :
+                    case "SetVar":
 
-                        break
-
+                        break;
+                    case "DeclareVar":
+                        
+                        break;
                     default:
                         GameConsole.LogWarning(`No such enemy command: <b>${this.Path.Actions[this.Tick][0]}</b>`)
-                    break;
+                        break;
                 }
 
                 this.Tick += 1;

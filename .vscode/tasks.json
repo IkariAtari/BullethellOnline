@@ -9,6 +9,14 @@
 			],
 			"group": "build",
 			"label": "tsc: build - tsconfig.json"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build",
+			"detail": "webpack --config webpack.config.js"
 		}
 	]
 }

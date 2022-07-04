@@ -17,6 +17,13 @@ module.exports = {
     filename: 'bundle.js',
     library: 'EntryPoint'
   },
+  resolve: {
+    modules: [
+      path.resolve(__dirname, '../node_modules')
+    ]
+  },
+
+  target: 'node',
 
   // Default mode for Webpack is production.
   // Depending on mode Webpack will apply different things

@@ -9,6 +9,9 @@ export class GameManager {
     constructor() {
         console.log("Game instance created");
         GameManager.Context = document.getElementById("canvas").getContext("2d");
+        let _canvas = document.getElementById("canvas");
+        GameManager.GameWidth = _canvas.clientWidth;
+        GameManager.GameHeight = _canvas.clientHeight;
         GameConsole.LOG_AREA = document.getElementById("console");
         this.CurrentLevel = new Level();
         this.timer = setInterval(() => this.GameUpdate(), 10);
